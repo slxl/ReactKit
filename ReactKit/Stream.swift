@@ -63,7 +63,7 @@ public class Stream<T>: Task<T, Void, ErrorProtocol>
     
     @discardableResult public func react<C: Canceller>(_ canceller: inout C?, reactClosure: (T) -> Void) -> Self
     {
-        super.progress(&canceller) { _, value in reactClosure(value) }
+        let _ = super.progress(&canceller) { _, value in reactClosure(value) }
         self.resume()
         return self
     }
