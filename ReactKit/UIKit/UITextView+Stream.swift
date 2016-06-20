@@ -12,7 +12,7 @@ public extension UITextView
 {
     public func textChangedStream() -> Stream<String?>
     {
-        return Notification.stream(UITextViewTextDidChangeNotification, self)
+        return Notification.stream(NSNotification.Name.UITextViewTextDidChange, self)
             |> map { notification -> String? in
                 if let textView = notification?.object as? UITextView {
                     return textView.text

@@ -8,10 +8,10 @@
 
 import Foundation
 
-public extension NSNotificationCenter
+public extension NotificationCenter
 {
     /// creates new Stream
-    public func stream(notificationName notificationName: String, object: AnyObject? = nil, queue: NSOperationQueue? = nil) -> Stream<NSNotification?>
+    public func stream(notificationName: Foundation.Notification.Name, object: AnyObject? = nil, queue: OperationQueue? = nil) -> Stream<Foundation.Notification?>
     {
         return Stream { [weak self] progress, fulfill, reject, configure in
             
@@ -28,7 +28,7 @@ public extension NSNotificationCenter
             configure.resume = {
                 if let self_ = self {
                     if observer == nil {
-                        observer = self_.addObserverForName(notificationName, object: object, queue: queue) { notification in
+                        observer = self_.addObserver(forName: notificationName, object: object, queue: queue) { notification in
                             progress(notification)
                         }
                     }
@@ -52,13 +52,13 @@ public extension NSNotificationCenter
 /// NSNotificationCenter helper
 public struct Notification
 {
-    public static func stream(notificationName: String, _ object: AnyObject?) -> Stream<NSNotification?>
+    public static func stream(_ notificationName: Foundation.Notification.Name, _ object: AnyObject?) -> Stream<Foundation.Notification?>
     {
-        return NSNotificationCenter.defaultCenter().stream(notificationName: notificationName, object: object)
+        return NotificationCenter.default().stream(notificationName: notificationName, object: object)
     }
     
-    public static func post(notificationName: String, _ object: AnyObject?)
+    public static func post(_ notificationName: Foundation.Notification.Name, _ object: AnyObject?)
     {
-        NSNotificationCenter.defaultCenter().postNotificationName(notificationName, object: object)
+        NotificationCenter.default().post(name: notificationName, object: object)
     }
 }

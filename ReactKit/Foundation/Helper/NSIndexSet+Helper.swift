@@ -10,13 +10,13 @@ import Foundation
 
 extension NSIndexSet
 {
-    public convenience init<S: SequenceType where S.Generator.Element == Int>(indexes: S)
+    public convenience init<S: Sequence where S.Iterator.Element == Int>(indexes: S)
     {
         let indexSet = NSMutableIndexSet()
         for index in indexes {
-            indexSet.addIndex(index)
+            indexSet.add(index)
         }
         
-        self.init(indexSet: indexSet)
+        self.init(indexSet: indexSet as IndexSet)
     }
 }

@@ -18,7 +18,7 @@ public class DynamicArray: NSObject
     // NOTE: can't use generics for `DynamicArray` when collaborating with `mutableArrayValueForKey()`
     public typealias Element = AnyObject
     
-    public typealias ChangedTuple = ([Element]?, NSKeyValueChange, NSIndexSet)
+    public typealias ChangedTuple = ([Element]?, NSKeyValueChange, IndexSet)
     
     // (NOTE: must use non-private for KVC(mutableArrayValueForKey)-compliancy)
     /// original array
@@ -33,7 +33,7 @@ public class DynamicArray: NSObject
     ///
     public var proxy: NSMutableArray
     {
-        return self.mutableArrayValueForKey(self._key)
+        return self.mutableArrayValue(forKey: self._key)
     }
     
     /// creates new stream which sends `(changedValues, changedType, indexSet)` 
@@ -82,7 +82,7 @@ public class ForwardingDynamicArray: DynamicArray
     ///
     public convenience init(object: NSObject, keyPath: String)
     {
-        let originalMutableArray = object.mutableArrayValueForKeyPath(keyPath)
+        let originalMutableArray = object.mutableArrayValue(forKeyPath: keyPath)
         
         //
         // NOTE:
@@ -117,12 +117,12 @@ public class ForwardingDynamicArray: DynamicArray
         forwardingStream ~> { [weak originalMutableArray] values, change, indexSet in
             
             switch change {
-                case .Insertion:
-                    originalMutableArray?.insertObjects(values!, atIndexes: indexSet)
-                case .Replacement:
-                    originalMutableArray?.replaceObjectsAtIndexes(indexSet, withObjects: values!)
-                case .Removal:
-                    originalMutableArray?.removeObjectsAtIndexes(indexSet)
+                case .insertion:
+                    originalMutableArray?.insert(values!, at: indexSet)
+                case .replacement:
+                    originalMutableArray?.replaceObjects(at: indexSet, with: values!)
+                case .removal:
+                    originalMutableArray?.removeObjects(at: indexSet)
                 default:
                     break
             }

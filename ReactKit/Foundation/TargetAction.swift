@@ -8,14 +8,14 @@
 
 import Foundation
 
-internal let _targetActionSelector: Selector = Selector("_fire:")
+internal let _targetActionSelector = #selector(_TargetActionProxy.fire)
 
 internal class _TargetActionProxy
 {
     // NOTE: can't use generics
     internal typealias T = AnyObject
     
-    internal typealias Handler = T -> Void
+    internal typealias Handler = (T) -> Void
     
     internal var handler: Handler
     
@@ -35,9 +35,7 @@ internal class _TargetActionProxy
 //        #endif
     }
     
-    // NOTE: add @objc for 'does not implement methodSignatureForSelector' error
-    // NOTE: can't use 'private' due to unrecognized selector
-    @objc internal func _fire(sender: T)
+    @objc func fire(sender: T)
     {
         self.handler(sender)
     }

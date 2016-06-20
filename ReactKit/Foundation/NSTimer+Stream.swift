@@ -8,21 +8,21 @@
 
 import Foundation
 
-public extension NSTimer
+public extension Timer
 {
-    public class func stream<T>(timeInterval timeInterval: NSTimeInterval, userInfo: AnyObject? = nil, repeats: Bool = true, map: NSTimer? -> T) -> Stream<T>
+    public class func stream<T>(timeInterval: TimeInterval, userInfo: AnyObject? = nil, repeats: Bool = true, map: (Timer?) -> T) -> Stream<T>
     {
         return Stream { progress, fulfill, reject, configure in
             
             let target = _TargetActionProxy { (self_: AnyObject?) in
-                progress(map(self_ as? NSTimer))
+                progress(map(self_ as? Timer))
                 
                 if !repeats {
                     fulfill()
                 }
             }
             
-            var timer: NSTimer?
+            var timer: Timer?
             
             configure.pause = {
                 timer?.invalidate()
@@ -30,8 +30,8 @@ public extension NSTimer
             }
             configure.resume = {
                 if timer == nil {
-                    timer = NSTimer(timeInterval: timeInterval, target: target, selector: _targetActionSelector, userInfo: userInfo, repeats: repeats)
-                    NSRunLoop.currentRunLoop().addTimer(timer!, forMode: NSRunLoopCommonModes)
+                    timer = Timer(timeInterval: timeInterval, target: target, selector: _targetActionSelector, userInfo: userInfo, repeats: repeats)
+                    RunLoop.current().add(timer!, forMode: RunLoopMode.commonModes)
                 }
             }
             configure.cancel = {

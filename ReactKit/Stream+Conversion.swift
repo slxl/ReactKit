@@ -10,19 +10,21 @@ import Foundation
 import SwiftTask
 
 /// converts Stream<T> to Stream<U>
-public func asStream<T, U>(type: U.Type)(upstream: Stream<T>) -> Stream<U>
+public func asStream<T, U>(_ type: U.Type) -> (Stream<T>) -> Stream<U>
 {
-    let stream = upstream |> map { $0 as! U }
-    stream.name("\(upstream.name) |> asStream(\(type))")
-    return stream
+    return { upstream in
+        let stream = upstream |> map { $0 as! U }
+        return stream.name("\(upstream.name) |> asStream(\(type))")
+    }
 }
 
 /// converts Stream<T> to Stream<U?>
-public func asStream<T, U>(type: U?.Type)(upstream: Stream<T>) -> Stream<U?>
+public func asStream<T, U>(_ type: U?.Type) -> (Stream<T>) -> Stream<U?>
 {
-    let stream = upstream |> map { $0 as? U }
-    stream.name("\(upstream.name) |> asStream(\(type))")
-    return stream
+    return { upstream in
+        let stream = upstream |> map { $0 as? U }
+        return stream.name("\(upstream.name) |> asStream(\(type))")
+    }
 }
 
 public extension Stream
@@ -51,7 +53,7 @@ public extension Stream
                         reject(error)
                     }
                     else {
-                        let error = _RKError(.RejectedByInternalTask, "`task` is rejected/cancelled while `Stream.fromTask(task)`.")
+                        let error = _RKError(.rejectedByInternalTask, "`task` is rejected/cancelled while `Stream.fromTask(task)`.")
                         reject(error)
                     }
                 }
@@ -99,7 +101,7 @@ public extension Stream
                         reject(error)
                     }
                     else {
-                        let error = _RKError(.RejectedByInternalTask, "`task` is rejected/cancelled while `Stream.fromProgressTask(task)`.")
+                        let error = _RKError(.rejectedByInternalTask, "`task` is rejected/cancelled while `Stream.fromProgressTask(task)`.")
                         reject(error)
                     }
                 }

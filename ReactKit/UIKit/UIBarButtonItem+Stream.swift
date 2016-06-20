@@ -10,7 +10,7 @@ import UIKit
 
 public extension UIBarButtonItem
 {
-    public func stream<T>(map: UIBarButtonItem? -> T) -> Stream<T>
+    public func stream<T>(map: (UIBarButtonItem?) -> T) -> Stream<T>
     {
         return Stream<T> { [weak self] progress, fulfill, reject, configure in
             
@@ -18,14 +18,14 @@ public extension UIBarButtonItem
                 progress(map(self_ as? UIBarButtonItem))
             }
             
-            let addTargetAction: Void -> Void = {
+            let addTargetAction: (Void) -> Void = {
                 if let self_ = self {
                     self_.target = target
                     self_.action = _targetActionSelector
                 }
             }
             
-            let removeTargetAction: Void -> Void = {
+            let removeTargetAction: (Void) -> Void = {
                 if let self_ = self {
                     self_.target = nil
                     self_.action = nil

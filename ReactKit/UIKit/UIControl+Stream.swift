@@ -10,7 +10,7 @@ import UIKit
 
 public extension UIControl
 {
-    public func stream<T>(controlEvents controlEvents: UIControlEvents, map: UIControl? -> T) -> Stream<T>
+    public func stream<T>(controlEvents: UIControlEvents, map: (UIControl?) -> T) -> Stream<T>
     {
         return Stream<T> { [weak self] progress, fulfill, reject, configure in
             
@@ -38,17 +38,17 @@ public extension UIControl
             //
             configure.pause = {
                 if let self_ = self {
-                    self_.removeTarget(target, action: _targetActionSelector, forControlEvents: controlEvents)
+                    self_.removeTarget(target, action: _targetActionSelector, for: controlEvents)
                 }
             }
             configure.resume = {
                 if let self_ = self {
-                    self_.addTarget(target, action: _targetActionSelector, forControlEvents: controlEvents)
+                    self_.addTarget(target, action: _targetActionSelector, for: controlEvents)
                 }
             }
             configure.cancel = {
                 if let self_ = self {
-                    self_.removeTarget(target, action: _targetActionSelector, forControlEvents: controlEvents)
+                    self_.removeTarget(target, action: _targetActionSelector, for: controlEvents)
                 }
             }
             

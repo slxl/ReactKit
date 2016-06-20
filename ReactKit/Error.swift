@@ -12,17 +12,17 @@ public enum ReactKitError: Int
 {
     public static let Domain = "ReactKitErrorDomain"
     
-    case Cancelled = 0
-    case CancelledByDeinit = 1
-    case CancelledByUpstream = 2
-    case CancelledByTriggerStream = 3
-    case CancelledByInternalStream = 4
+    case cancelled = 0
+    case cancelledByDeinit = 1
+    case cancelledByUpstream = 2
+    case cancelledByTriggerStream = 3
+    case cancelledByInternalStream = 4
     
-    case RejectedByInternalTask = 1000
+    case rejectedByInternalTask = 1000
 }
 
 /// helper
-internal func _RKError(error: ReactKitError, _ localizedDescriptionKey: String) -> NSError
+internal func _RKError(_ error: ReactKitError, _ localizedDescriptionKey: String) -> NSError
 {
     return NSError(
         domain: ReactKitError.Domain,
