@@ -55,7 +55,7 @@ public class Stream<T>: Task<T, Void, ErrorProtocol>
     }
     
     /// progress-chaining with auto-resume
-    @discardableResult public func react(reactClosure: (T) -> Void) -> Self
+    @discardableResult public func react(_ reactClosure: (T) -> Void) -> Self
     {
         var dummyCanceller: Canceller? = nil
         return self.react(&dummyCanceller, reactClosure: reactClosure)
@@ -255,7 +255,7 @@ public extension Stream
 
 /// useful for injecting side-effects
 /// a.k.a Rx.do, tap
-public func peek<T>(peekClosure: (T) -> Void) -> (upstream: Stream<T>) -> Stream<T>
+public func peek<T>(_ peekClosure: (T) -> Void) -> (upstream: Stream<T>) -> Stream<T>
 {
     return { (upstream: Stream<T>) in
         return Stream<T> { progress, fulfill, reject, configure in
@@ -274,7 +274,7 @@ public func peek<T>(peekClosure: (T) -> Void) -> (upstream: Stream<T>) -> Stream
 
 /// Stops pause/resume/cancel propagation to upstream, and only pass-through `progressValue`s to downstream.
 /// Useful for oneway-pipelining to consecutive downstream.
-public func branch<T>(upstream: Stream<T>) -> Stream<T>
+public func branch<T>(_ upstream: Stream<T>) -> Stream<T>
 {
     return Stream<T> { progress, fulfill, reject, configure in
         
@@ -296,7 +296,7 @@ public func branch<T>(upstream: Stream<T>) -> Stream<T>
 
 /// creates your own customizable & method-chainable stream without writing `return Stream<U> { ... }`
 public func customize<T, U>
-    (customizeClosure: (upstream: Stream<T>, progress: Stream<U>.ProgressHandler, fulfill: Stream<U>.FulfillHandler, reject: Stream<U>.RejectHandler) -> Void)
+    (_ customizeClosure: (upstream: Stream<T>, progress: Stream<U>.ProgressHandler, fulfill: Stream<U>.FulfillHandler, reject: Stream<U>.RejectHandler) -> Void)
     -> (upstream: Stream<T>)
 -> Stream<U>
 {
@@ -328,7 +328,7 @@ public func map<T, U>(_ transform: (T) -> U) -> (upstream: Stream<T>) -> Stream<
 }
 
 /// map using (oldValue, newValue)
-public func map2<T, U>(transform2: (oldValue: T?, newValue: T) -> U) -> (upstream: Stream<T>) -> Stream<U>
+public func map2<T, U>(_ transform2: (oldValue: T?, newValue: T) -> U) -> (upstream: Stream<T>) -> Stream<U>
 {
     return { (upstream: Stream<T>) in
         var oldValue: T?
@@ -366,7 +366,7 @@ public func mapAccumulate<T, U>(_ initialValue: U, _ accumulateClosure: (accumul
 }
 
 /// map to stream + flatten
-public func flatMap<T, U>(style: FlattenStyle = .Merge, transform: (T) -> Stream<U>) -> (upstream: Stream<T>) -> Stream<U>
+public func flatMap<T, U>(_ style: FlattenStyle = .Merge, transform: (T) -> Stream<U>) -> (upstream: Stream<T>) -> Stream<U>
 {
     return { (upstream: Stream<T>) in
         let stream = upstream |> map(transform) |> flatten(style)
@@ -403,7 +403,7 @@ public func buffer<T>(capacity: Int = Int.max) -> (upstream: Stream<T>) -> Strea
     }
 }
 
-public func bufferBy<T, U>(triggerStream: Stream<U>) -> (upstream: Stream<T>) -> Stream<[T]>
+public func bufferBy<T, U>(_ triggerStream: Stream<U>) -> (upstream: Stream<T>) -> Stream<[T]>
 {
     return { (upstream: Stream<T>) in
         return Stream<[T]> { [weak triggerStream] progress, fulfill, reject, configure in
@@ -441,7 +441,7 @@ public func bufferBy<T, U>(triggerStream: Stream<U>) -> (upstream: Stream<T>) ->
     }
 }
 
-public func groupBy<T, Key: Hashable>(groupingClosure: (T) -> Key) -> (upstream: Stream<T>) -> Stream<(Key, Stream<T>)>
+public func groupBy<T, Key: Hashable>(_ groupingClosure: (T) -> Key) -> (upstream: Stream<T>) -> Stream<(Key, Stream<T>)>
 {
     return { (upstream: Stream<T>) in
         return Stream<(Key, Stream<T>)> { progress, fulfill, reject, configure in
@@ -478,7 +478,7 @@ public func groupBy<T, Key: Hashable>(groupingClosure: (T) -> Key) -> (upstream:
 // MARK: filtering
 
 /// filter using newValue only
-public func filter<T>(filterClosure: (T) -> Bool) -> (upstream: Stream<T>) -> Stream<T>
+public func filter<T>(_ filterClosure: (T) -> Bool) -> (upstream: Stream<T>) -> Stream<T>
 {
     return { (upstream: Stream<T>) in
         return Stream<T> { progress, fulfill, reject, configure in
@@ -497,7 +497,7 @@ public func filter<T>(filterClosure: (T) -> Bool) -> (upstream: Stream<T>) -> St
 }
 
 /// filter using (oldValue, newValue)
-public func filter2<T>(filterClosure2: (oldValue: T?, newValue: T) -> Bool) -> (upstream: Stream<T>) -> Stream<T>
+public func filter2<T>(_ filterClosure2: (oldValue: T?, newValue: T) -> Bool) -> (upstream: Stream<T>) -> Stream<T>
 {
     return { (upstream: Stream<T>) in
         var oldValue: T?
@@ -579,7 +579,7 @@ public func takeUntil<T, U>(_ triggerStream: Stream<U>) -> (upstream: Stream<T>)
     }
 }
 
-public func skip<T>(skipCount: Int) -> (upstream: Stream<T>) -> Stream<T>
+public func skip<T>(_ skipCount: Int) -> (upstream: Stream<T>) -> Stream<T>
 {
     return { (upstream: Stream<T>) in
         return Stream<T> { progress, fulfill, reject, configure in
@@ -600,7 +600,7 @@ public func skip<T>(skipCount: Int) -> (upstream: Stream<T>) -> Stream<T>
     }
 }
 
-public func skipUntil<T, U>(triggerStream: Stream<U>) -> (upstream: Stream<T>) -> Stream<T>
+public func skipUntil<T, U>(_ triggerStream: Stream<U>) -> (upstream: Stream<T>) -> Stream<T>
 {
     return { (upstream: Stream<T>) in
         return Stream<T> { [weak triggerStream] progress, fulfill, reject, configure in
@@ -636,7 +636,7 @@ public func skipUntil<T, U>(triggerStream: Stream<U>) -> (upstream: Stream<T>) -
     }
 }
 
-public func sample<T, U>(triggerStream: Stream<U>) -> (upstream: Stream<T>) -> Stream<T>
+public func sample<T, U>(_ triggerStream: Stream<U>) -> (upstream: Stream<T>) -> Stream<T>
 {
     return { (upstream: Stream<T>) in
         return Stream<T> { [weak triggerStream] progress, fulfill, reject, configure in
@@ -666,7 +666,7 @@ public func sample<T, U>(triggerStream: Stream<U>) -> (upstream: Stream<T>) -> S
     }
 }
 
-public func distinct<H: Hashable>(upstream: Stream<H>) -> Stream<H>
+public func distinct<H: Hashable>(_ upstream: Stream<H>) -> Stream<H>
 {
     return Stream<H> { progress, fulfill, reject, configure in
         
@@ -685,7 +685,7 @@ public func distinct<H: Hashable>(upstream: Stream<H>) -> Stream<H>
     }
 }
 
-public func distinctUntilChanged<E: Equatable>(upstream: Stream<E>) -> Stream<E>
+public func distinctUntilChanged<E: Equatable>(_ upstream: Stream<E>) -> Stream<E>
 {
     let stream = upstream |> filter2 { $0 != $1 }
     return stream.name("\(upstream.name) |> distinctUntilChanged")
@@ -980,7 +980,7 @@ public func reduce<T, U>(_ initialValue: U, _ accumulateClosure: (accumulatedVal
 /// `upstream |> startAsync(queue) ~> { ... }` is same as `dispatch_async(queue, { upstream ~> {...} })`,
 /// but it guarantees the `upstream` to start on target `queue` if not started yet.
 ///
-public func startAsync<T>(queue: DispatchQueue) -> (upstream: Stream<T>) -> Stream<T>
+public func startAsync<T>(_ queue: DispatchQueue) -> (upstream: Stream<T>) -> Stream<T>
 {
     return { (upstream: Stream<T>) in
         return Stream<T> { progress, fulfill, reject, configure in
@@ -1009,7 +1009,7 @@ public func startAsync<T>(queue: DispatchQueue) -> (upstream: Stream<T>) -> Stre
 ///
 /// - parameter queue: `dispatch_queue_t` to perform consecutive stream operations. Using concurrent queue is not recommended.
 ///
-public func async<T>(queue: DispatchQueue) -> (upstream: Stream<T>) -> Stream<T>
+public func async<T>(_ queue: DispatchQueue) -> (upstream: Stream<T>) -> Stream<T>
 {
     return { (upstream: Stream<T>) in
         return Stream<T> { progress, fulfill, reject, configure in
@@ -1037,7 +1037,7 @@ public func async<T>(queue: DispatchQueue) -> (upstream: Stream<T>) -> Stream<T>
 /// - Experiment: async + backpressure using blocking semaphore
 ///
 public func asyncBackpressureBlock<T>(
-    queue: DispatchQueue,
+    _ queue: DispatchQueue,
     high highCountForPause: Int,
     low lowCountForResume: Int
 ) -> (upstream: Stream<T>) -> Stream<T>
@@ -1102,7 +1102,7 @@ public func asyncBackpressureBlock<T>(
 
 /// Merges multiple streams into single stream.
 /// See also: mergeInner
-public func mergeAll<T>(streams: [Stream<T>]) -> Stream<T>
+public func mergeAll<T>(_ streams: [Stream<T>]) -> Stream<T>
 {
     let stream = Stream.sequence(streams) |> mergeInner
     return stream.name("mergeAll")
@@ -1161,7 +1161,7 @@ public func merge2All<T>(_ streams: [Stream<T>]) -> Stream<(values: [T?], change
     }.name("merge2All")
 }
 
-public func combineLatestAll<T>(streams: [Stream<T>]) -> Stream<[T]>
+public func combineLatestAll<T>(_ streams: [Stream<T>]) -> Stream<[T]>
 {
     let stream = merge2All(streams)
         |> filter { values, _ in
@@ -1179,7 +1179,7 @@ public func combineLatestAll<T>(streams: [Stream<T>]) -> Stream<[T]>
     return stream.name("combineLatestAll")
 }
 
-public func zipAll<T>(streams: [Stream<T>]) -> Stream<[T]>
+public func zipAll<T>(_ streams: [Stream<T>]) -> Stream<[T]>
 {
     precondition(streams.count > 1)
     
@@ -1268,7 +1268,7 @@ public func flatten<T>(_ style: FlattenStyle) -> (upstream: Stream<Stream<T>>) -
 ///
 /// - e.g. `let mergedStream = [stream1, stream2, ...] |> mergeInner`
 ///
-public func mergeInner<T>(upstream: Stream<Stream<T>>) -> Stream<T>
+public func mergeInner<T>(_ upstream: Stream<Stream<T>>) -> Stream<T>
 {
     return Stream<T> { progress, fulfill, reject, configure in
         
@@ -1319,7 +1319,7 @@ public func mergeInner<T>(upstream: Stream<Stream<T>>) -> Stream<T>
     }.name("mergeInner")
 }
 
-public func concatInner<T>(upstream: Stream<Stream<T>>) -> Stream<T>
+public func concatInner<T>(_ upstream: Stream<Stream<T>>) -> Stream<T>
 {
     return Stream<T> { progress, fulfill, reject, configure in
         
@@ -1390,7 +1390,7 @@ public func concatInner<T>(upstream: Stream<Stream<T>>) -> Stream<T>
 
 /// uses the latest innerStream and cancels previous innerStreams
 /// a.k.a Rx.switchLatest
-public func switchLatestInner<T>(upstream: Stream<Stream<T>>) -> Stream<T>
+public func switchLatestInner<T>(_ upstream: Stream<Stream<T>>) -> Stream<T>
 {
     return Stream<T> { progress, fulfill, reject, configure in
         
@@ -1509,7 +1509,7 @@ public func prestart<T>(capacity: Int = Int.max) -> (upstreamProducer: Stream<T>
 }
 
 /// a.k.a Rx.repeat
-public func times<T>(repeatCount: Int) -> (upstreamProducer: Stream<T>.Producer) -> Stream<T>.Producer
+public func times<T>(_ repeatCount: Int) -> (upstreamProducer: Stream<T>.Producer) -> Stream<T>.Producer
 {
     return { (upstreamProducer: Stream<T>.Producer) -> Stream<T>.Producer in
         
@@ -1591,7 +1591,7 @@ public extension Stream
 }
 
 /// alias for `mapAccumulate()`
-public func scan<T, U>(initialValue: U, _ accumulateClosure: (accumulatedValue: U, newValue: T) -> U) -> (upstream: Stream<T>) -> Stream<U>
+public func scan<T, U>(_ initialValue: U, _ accumulateClosure: (accumulatedValue: U, newValue: T) -> U) -> (upstream: Stream<T>) -> Stream<U>
 {
     return { (upstream: Stream<T>) in
         return mapAccumulate(initialValue, accumulateClosure)(upstream: upstream)
