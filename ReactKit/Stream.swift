@@ -1322,7 +1322,6 @@ public func prestart<T>(capacity: Int = Int.max) -> (upstreamProducer: Stream<T>
         
         return {
             return Stream<T> { progress, fulfill, reject, configure in
-                
                 var canceller: Canceller? = nil
                 _bindToUpstream(upstream, fulfill, reject, configure, canceller)
                 
@@ -1351,7 +1350,6 @@ public func times<T>(_ repeatCount: Int) -> (upstreamProducer: Stream<T>.Produce
         
         return {
             return Stream<T> { progress, fulfill, reject, configure in
-                
                 var countDown = repeatCount
                 
                 let performRecursively: () -> Void = _fix { recurse in
