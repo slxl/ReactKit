@@ -18,18 +18,8 @@ internal class _TargetActionProxy {
     
     internal init(handler: Handler) {
         self.handler = handler
-        
-//        #if DEBUG
-//            print("[init] \(self)")
-//        #endif
     }
-    
-    deinit {
-//        #if DEBUG
-//            print("[deinit] \(self)")
-//        #endif
-    }
-    
+
     @objc func fire(sender: T) {
         self.handler(sender)
     }

@@ -32,19 +32,9 @@ public class Stream<T>: Task<T, Void, ErrorProtocol> {
         super.init(weakified: true, paused: true, initClosure: initClosure)
         
         self.name = "DefaultStream"
-        
-//        #if DEBUG
-//            let addr = String(format: "%p", unsafeAddressOf(self))
-//            NSLog("[init] \(self.name) \(addr)")
-//        #endif
     }
     
     deinit {
-//        #if DEBUG
-//            let addr = String(format: "%p", unsafeAddressOf(self))
-//            NSLog("[deinit] \(self.name) \(addr)")
-//        #endif
-        
         let cancelError = _RKError(.cancelledByDeinit, "Stream=\(self.name) is cancelled via deinit.")
         
         self.cancel(error: cancelError)

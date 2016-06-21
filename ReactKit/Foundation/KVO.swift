@@ -99,41 +99,21 @@ internal class _KVOProxy: NSObject {
         super.init()
         
         self.start()
-        
-//        #if DEBUG
-//            print("[init] \(self)")
-//        #endif
     }
     
     deinit {
-//        #if DEBUG
-//            print("[deinit] \(self)")
-//        #endif
-        
         self.stop()
     }
     
     internal func start() {
         if _isObserving { return }
-        
         _isObserving = true
-        
-//        #if DEBUG
-//            print("[KVO] start")
-//        #endif
-        
         self._target.addObserver(self, forKeyPath: self._keyPath, options: .new, context: &ReactKitKVOContext)
     }
     
     internal func stop() {
         if !_isObserving { return }
-        
         _isObserving = false
-        
-//        #if DEBUG
-//            print("[KVO] stop")
-//        #endif
-        
         self._target.removeObserver(self, forKeyPath: self._keyPath)
     }
     
