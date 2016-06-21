@@ -314,7 +314,7 @@ public func mapAccumulate<T, U>(_ initialValue: U, _ accumulateClosure: (accumul
 }
 
 /// map to stream + flatten
-public func flatMap<T, U>(_ style: FlattenStyle = .Merge, transform: (T) -> Stream<U>) -> (upstream: Stream<T>) -> Stream<U> {
+public func flatMap<T, U>(_ style: FlattenStyle = .merge, transform: (T) -> Stream<U>) -> (upstream: Stream<T>) -> Stream<U> {
     return { (upstream: Stream<T>) in
         let stream = upstream |> map(transform) |> flatten(style)
         return stream.name("\(upstream.name) |> flatMap(.\(style))")
@@ -1096,18 +1096,18 @@ public func zipAll<T>(_ streams: [Stream<T>]) -> Stream<[T]> {
 //--------------------------------------------------
 
 public enum FlattenStyle: String, CustomStringConvertible {
-    case Merge = "Merge"
-    case Concat = "Concat"
-    case Latest = "Latest"
+    case merge = "Merge"
+    case concat = "Concat"
+    case latest = "Latest"
     
     public var description: String { return self.rawValue }
 }
 
 public func flatten<T>(_ style: FlattenStyle) -> (upstream: Stream<Stream<T>>) -> Stream<T> {
     switch style {
-        case .Merge: return mergeInner
-        case .Concat: return concatInner
-        case .Latest: return switchLatestInner
+        case .merge: return mergeInner
+        case .concat: return concatInner
+        case .latest: return switchLatestInner
     }
 }
 
