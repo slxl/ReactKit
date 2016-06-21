@@ -209,8 +209,8 @@ public extension Stream {
     /// NOTE: To prevent infinite loop, use `take(maxCount)` to limit the number of value generation.
     ///
     public class func infiniteSequence(_ initialValue: T, nextClosure: (T) -> T) -> Stream<T> {
-        let generator = _InfiniteGenerator<T>(initialValue: initialValue, nextClosure: nextClosure)
-        return Stream<T>.sequence(AnySequence({generator})).name("Stream.infiniteSequence")
+        let iterator = _InfiniteIterator<T>(initialValue: initialValue, nextClosure: nextClosure)
+        return Stream<T>.sequence(AnySequence({iterator})).name("Stream.infiniteSequence")
     }
 }
 
@@ -1552,7 +1552,7 @@ public prefix func ^ <T, U>(closure: (T) -> U) -> ((T) -> U) {
 // MARK: - Utility
 //--------------------------------------------------
 
-internal struct _InfiniteGenerator<T>: IteratorProtocol {
+internal struct _InfiniteIterator<T>: IteratorProtocol {
     let initialValue: T
     let nextClosure: (T) -> T
     
