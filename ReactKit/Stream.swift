@@ -65,9 +65,9 @@ public class Stream<T>: Task<T, Void, ErrorProtocol> {
     /// Easy strong referencing by owner e.g. UIViewController holding its UI component's stream
     /// without explicitly defining stream as property.
     public func ownedBy(_ owner: NSObject) -> Stream<T> {
-        var owninigStreams = owner._owninigStreams
-        owninigStreams.append(self)
-        owner._owninigStreams = owninigStreams
+        var owningStreams = owner._owningStreams
+        owningStreams.append(self)
+        owner._owningStreams = owningStreams
         
         return self
     }

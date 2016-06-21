@@ -8,22 +8,22 @@
 
 import Foundation
 
-private var owninigStreamsKey: UInt8 = 0
+private var owningStreamsKey: UInt8 = 0
 
 internal extension NSObject {
     internal typealias AnyStream = AnyObject // NOTE: can't use Stream<AnyObject?>
     
-    internal var _owninigStreams: [AnyStream] {
+    internal var _owningStreams: [AnyStream] {
         get {
-            var owninigStreams = objc_getAssociatedObject(self, &owninigStreamsKey) as? [AnyStream]
-            if owninigStreams == nil {
-                owninigStreams = []
-                self._owninigStreams = owninigStreams!
+            var owningStreams = objc_getAssociatedObject(self, &owningStreamsKey) as? [AnyStream]
+            if owningStreams == nil {
+                owningStreams = []
+                self._owningStreams = owningStreams!
             }
-            return owninigStreams!
+            return owningStreams!
         }
         set {
-            objc_setAssociatedObject(self, &owninigStreamsKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &owningStreamsKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
 }
