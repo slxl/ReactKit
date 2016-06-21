@@ -61,79 +61,6 @@ public class Stream<T>: Task<T, Void, ErrorProtocol> {
         
         return self
     }
-    
-}
-
-///
-/// Helper method to bind downstream's `fulfill`/`reject`/`configure` handlers to `upstream`.
-///
-/// - parameter upstream: upstream to be bound to downstream
-/// - parameter downstreamFulfill: `downstream`'s `fulfill`
-/// - parameter downstreamReject: `downstream`'s `reject`
-/// - parameter downstreamConfigure: `downstream`'s `configure`
-/// - parameter reactCanceller: `canceller` used in `upstream.react(&canceller)` (`@autoclosure(escaping)` for lazy evaluation)
-///
-private func _bindToUpstream<T, C: Canceller>(_ upstream: Stream<T>, _ downstreamFulfill: (() -> Void)?, _ downstreamReject: ((ErrorProtocol) -> Void)?, _ downstreamConfigure: TaskConfiguration?, _ reactCanceller: @autoclosure(escaping) () -> C?) {
-    //
-    // NOTE:
-    // Bind downstream's `configure` to upstream
-    // BEFORE performing its `progress()`/`then()`/`success()`/`failure()`
-    // so that even when downstream **immediately finishes** on its 1st resume,
-    // upstream can know `configure.isFinished = true`
-    // while performing its `initClosure`.
-    //
-    // This is especially important for stopping immediate-infinite-sequence,
-    // e.g. `infiniteStream.take(3)` will stop infinite-while-loop at end of 3rd iteration.
-    //
-
-    // NOTE: downstream should capture upstream
-    if let downstreamConfigure = downstreamConfigure {
-        let oldPause = downstreamConfigure.pause
-        downstreamConfigure.pause = {
-            oldPause?()
-            upstream.pause()
-        }
-        
-        let oldResume = downstreamConfigure.resume
-        downstreamConfigure.resume = {
-            oldResume?()
-            upstream.resume()
-        }
-        
-        // NOTE: `configure.cancel()` is always called on downstream-finish
-        let oldCancel = downstreamConfigure.cancel
-        downstreamConfigure.cancel = {
-            oldCancel?()
-            
-            let canceller = reactCanceller()
-            canceller?.cancel()
-            upstream.cancel()
-        }
-    }
-    
-    if downstreamFulfill != nil || downstreamReject != nil {
-        let upstreamName = upstream.name
-
-        // fulfill/reject downstream on upstream-fulfill/reject/cancel
-        upstream.then { value, errorInfo -> Void in
-            _finishDownstreamOnUpstreamFinished(upstreamName, value, errorInfo, downstreamFulfill, downstreamReject)
-        }
-    }
-}
-
-/// helper method to send upstream's fulfill/reject to downstream
-private func _finishDownstreamOnUpstreamFinished(_ upstreamName: String, _ upstreamValue: Void?, _ upstreamErrorInfo: Stream<Void>.ErrorInfo?, _ downstreamFulfill: (() -> Void)?, _ downstreamReject: ((ErrorProtocol) -> Void)?) {
-    if upstreamValue != nil {
-        downstreamFulfill?()
-    } else if let upstreamErrorInfo = upstreamErrorInfo {
-        // rejected
-        if let upstreamError = upstreamErrorInfo.error {
-            downstreamReject?(upstreamError)
-        } else { // cancelled
-            let cancelError = _RKError(.cancelledByUpstream, "Upstream=\(upstreamName) is rejected or cancelled.")
-            downstreamReject?(cancelError)
-        }
-    }
 }
 
 //--------------------------------------------------
@@ -1573,4 +1500,77 @@ internal func _summary<T>(_ type: T) -> String {
 
 internal func _queueLabel(_ queue: DispatchQueue) -> String {
     return queue.label.characters.split(separator: ".").map { String($0) }.last ?? "?"
+}
+
+
+///
+/// Helper method to bind downstream's `fulfill`/`reject`/`configure` handlers to `upstream`.
+///
+/// - parameter upstream: upstream to be bound to downstream
+/// - parameter downstreamFulfill: `downstream`'s `fulfill`
+/// - parameter downstreamReject: `downstream`'s `reject`
+/// - parameter downstreamConfigure: `downstream`'s `configure`
+/// - parameter reactCanceller: `canceller` used in `upstream.react(&canceller)` (`@autoclosure(escaping)` for lazy evaluation)
+///
+private func _bindToUpstream<T, C: Canceller>(_ upstream: Stream<T>, _ downstreamFulfill: (() -> Void)?, _ downstreamReject: ((ErrorProtocol) -> Void)?, _ downstreamConfigure: TaskConfiguration?, _ reactCanceller: @autoclosure(escaping) () -> C?) {
+    //
+    // NOTE:
+    // Bind downstream's `configure` to upstream
+    // BEFORE performing its `progress()`/`then()`/`success()`/`failure()`
+    // so that even when downstream **immediately finishes** on its 1st resume,
+    // upstream can know `configure.isFinished = true`
+    // while performing its `initClosure`.
+    //
+    // This is especially important for stopping immediate-infinite-sequence,
+    // e.g. `infiniteStream.take(3)` will stop infinite-while-loop at end of 3rd iteration.
+    //
+    
+    // NOTE: downstream should capture upstream
+    if let downstreamConfigure = downstreamConfigure {
+        let oldPause = downstreamConfigure.pause
+        downstreamConfigure.pause = {
+            oldPause?()
+            upstream.pause()
+        }
+        
+        let oldResume = downstreamConfigure.resume
+        downstreamConfigure.resume = {
+            oldResume?()
+            upstream.resume()
+        }
+        
+        // NOTE: `configure.cancel()` is always called on downstream-finish
+        let oldCancel = downstreamConfigure.cancel
+        downstreamConfigure.cancel = {
+            oldCancel?()
+            
+            let canceller = reactCanceller()
+            canceller?.cancel()
+            upstream.cancel()
+        }
+    }
+    
+    if downstreamFulfill != nil || downstreamReject != nil {
+        let upstreamName = upstream.name
+        
+        // fulfill/reject downstream on upstream-fulfill/reject/cancel
+        upstream.then { value, errorInfo -> Void in
+            _finishDownstreamOnUpstreamFinished(upstreamName, value, errorInfo, downstreamFulfill, downstreamReject)
+        }
+    }
+}
+
+/// helper method to send upstream's fulfill/reject to downstream
+private func _finishDownstreamOnUpstreamFinished(_ upstreamName: String, _ upstreamValue: Void?, _ upstreamErrorInfo: Stream<Void>.ErrorInfo?, _ downstreamFulfill: (() -> Void)?, _ downstreamReject: ((ErrorProtocol) -> Void)?) {
+    if upstreamValue != nil {
+        downstreamFulfill?()
+    } else if let upstreamErrorInfo = upstreamErrorInfo {
+        // rejected
+        if let upstreamError = upstreamErrorInfo.error {
+            downstreamReject?(upstreamError)
+        } else { // cancelled
+            let cancelError = _RKError(.cancelledByUpstream, "Upstream=\(upstreamName) is rejected or cancelled.")
+            downstreamReject?(cancelError)
+        }
+    }
 }
