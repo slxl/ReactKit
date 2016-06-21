@@ -8,12 +8,9 @@
 
 import UIKit
 
-public extension UIBarButtonItem
-{
-    public func stream<T>(map: (UIBarButtonItem?) -> T) -> Stream<T>
-    {
+public extension UIBarButtonItem {
+    public func stream<T>(map: (UIBarButtonItem?) -> T) -> Stream<T> {
         return Stream<T> { [weak self] progress, fulfill, reject, configure in
-            
             let target = _TargetActionProxy { (self_: AnyObject?) in
                 progress(map(self_ as? UIBarButtonItem))
             }
@@ -43,12 +40,10 @@ public extension UIBarButtonItem
             }
             
             configure.resume?()
-            
         }.name("\(_summary(self))") |> takeUntil(self.deinitStream)
     }
     
-    public func stream<T>(mappedValue: T) -> Stream<T>
-    {
+    public func stream<T>(mappedValue: T) -> Stream<T> {
         return self.stream { _ in mappedValue }
     }
 }

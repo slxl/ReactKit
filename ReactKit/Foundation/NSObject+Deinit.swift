@@ -10,10 +10,8 @@ import Foundation
 
 private var deinitStreamKey: UInt8 = 0
 
-public extension NSObject
-{
-    private var _deinitStream: Stream<AnyObject?>?
-    {
+public extension NSObject {
+    private var _deinitStream: Stream<AnyObject?>? {
         get {
             return objc_getAssociatedObject(self, &deinitStreamKey) as? Stream<AnyObject?>
         }
@@ -22,8 +20,7 @@ public extension NSObject
         }
     }
     
-    public var deinitStream: Stream<AnyObject?>
-    {
+    public var deinitStream: Stream<AnyObject?> {
         var stream: Stream<AnyObject?>? = self._deinitStream
         
         if stream == nil {

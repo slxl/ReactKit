@@ -13,8 +13,7 @@ import Foundation
 ///
 /// (NOTE: to forward changes to original array, use `ForwardingDynamicArray` instead)
 ///
-public class DynamicArray: NSObject
-{
+public class DynamicArray: NSObject {
     // NOTE: can't use generics for `DynamicArray` when collaborating with `mutableArrayValueForKey()`
     public typealias Element = AnyObject
     
@@ -31,21 +30,18 @@ public class DynamicArray: NSObject
     ///
     /// NOTE: Make sure to bind `self.stream` first i.e. `self.stream ~> { ... }` (KVO-addObserver) before using this.
     ///
-    public var proxy: NSMutableArray
-    {
+    public var proxy: NSMutableArray {
         return self.mutableArrayValue(forKey: self._key)
     }
     
     /// creates new stream which sends `(changedValues, changedType, indexSet)` 
     /// via changes in `self.proxy` NSMutableArray
-    public func stream() -> Stream<ChangedTuple>
-    {
+    public func stream() -> Stream<ChangedTuple> {
         return KVO.detailedStream(self, self._key)
             |> map { ($0 as? [Element], $1, $2!) }
     }
     
-    public init(_ array: [Element] = [])
-    {
+    public init(_ array: [Element] = []) {
         // NOTE: `self._array` will be change via `self.proxy`, but immutable `array` won't
         self._array = array
         
@@ -54,8 +50,7 @@ public class DynamicArray: NSObject
 //        print("[init] \(self)")
     }
     
-    deinit
-    {
+    deinit {
 //        print("[deinit] \(self)")
     }
 }
@@ -72,16 +67,14 @@ public class DynamicArray: NSObject
 ///
 /// will also add `newItem` to `myObj.array`, even when this array is NSArray (thanks to KVC magic).
 ///
-public class ForwardingDynamicArray: DynamicArray
-{
+public class ForwardingDynamicArray: DynamicArray {
     ///
     /// Initializer for forwarding changes to KVC-compliant model's array (accessible via `object.valueForKeyPath(keyPath)`).
     ///
     /// - parameter object: Model object to call `mutableArrayValueForKeyPath()` as its receiver.
     /// - parameter keyPath: Argument for `mutableArrayValueForKeyPath()`.
     ///
-    public convenience init(object: NSObject, keyPath: String)
-    {
+    public convenience init(object: NSObject, keyPath: String) {
         let originalMutableArray = object.mutableArrayValue(forKeyPath: keyPath)
         
         //
@@ -102,13 +95,11 @@ public class ForwardingDynamicArray: DynamicArray
     ///
     /// - parameter original: Original NSMutableArray. (DO NOT SET NSMutableArray which is created via **mutableArrayValueForKey()**).
     ///
-    public convenience init(original originalMutableArray: NSMutableArray)
-    {
+    public convenience init(original originalMutableArray: NSMutableArray) {
         self.init(original: originalMutableArray, forwardingStreamOwner: originalMutableArray)
     }
     
-    internal init(original originalMutableArray: NSMutableArray, forwardingStreamOwner: NSObject)
-    {
+    internal init(original originalMutableArray: NSMutableArray, forwardingStreamOwner: NSObject) {
         super.init(originalMutableArray as [Element])
         
         let forwardingStream = self.stream().ownedBy(forwardingStreamOwner)
@@ -127,6 +118,5 @@ public class ForwardingDynamicArray: DynamicArray
                     break
             }
         }
-        
     }
 }

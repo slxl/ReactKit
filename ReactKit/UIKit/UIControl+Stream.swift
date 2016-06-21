@@ -8,14 +8,10 @@
 
 import UIKit
 
-public extension UIControl
-{
-    public func stream<T>(controlEvents: UIControlEvents, map: (UIControl?) -> T) -> Stream<T>
-    {
+public extension UIControl {
+    public func stream<T>(controlEvents: UIControlEvents, map: (UIControl?) -> T) -> Stream<T> {
         return Stream<T> { [weak self] progress, fulfill, reject, configure in
-            
             let target = _TargetActionProxy { (self_: AnyObject?) in
-                
                 //
                 // WARN:
                 //
@@ -53,7 +49,6 @@ public extension UIControl
             }
             
             configure.resume?()
-            
         }.name("\(_summary(self))-\(controlEvents)") |> takeUntil(self.deinitStream)
     }
 }

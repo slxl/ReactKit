@@ -8,10 +8,8 @@
 
 import UIKit
 
-public extension UITextView
-{
-    public func textChangedStream() -> Stream<String?>
-    {
+public extension UITextView {
+    public func textChangedStream() -> Stream<String?> {
         return Notification.stream(NSNotification.Name.UITextViewTextDidChange, self)
             |> map { notification -> String? in
                 if let textView = notification?.object as? UITextView {

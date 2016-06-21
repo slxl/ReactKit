@@ -8,10 +8,8 @@
 
 import UIKit
 
-public extension UITextField
-{
-    public func textChangedStream() -> Stream<String?>
-    {
+public extension UITextField {
+    public func textChangedStream() -> Stream<String?> {
         return self.stream(controlEvents: .editingChanged) { (sender: UIControl?) -> String? in
             if let sender = sender as? UITextField {
                 return sender.text

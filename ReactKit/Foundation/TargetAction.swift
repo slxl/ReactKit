@@ -10,17 +10,13 @@ import Foundation
 
 internal let _targetActionSelector = #selector(_TargetActionProxy.fire)
 
-internal class _TargetActionProxy
-{
+internal class _TargetActionProxy {
     // NOTE: can't use generics
     internal typealias T = AnyObject
-    
     internal typealias Handler = (T) -> Void
-    
     internal var handler: Handler
     
-    internal init(handler: Handler)
-    {
+    internal init(handler: Handler) {
         self.handler = handler
         
 //        #if DEBUG
@@ -28,15 +24,13 @@ internal class _TargetActionProxy
 //        #endif
     }
     
-    deinit
-    {
+    deinit {
 //        #if DEBUG
 //            print("[deinit] \(self)")
 //        #endif
     }
     
-    @objc func fire(sender: T)
-    {
+    @objc func fire(sender: T) {
         self.handler(sender)
     }
 }

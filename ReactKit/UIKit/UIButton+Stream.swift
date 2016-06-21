@@ -8,17 +8,14 @@
 
 import UIKit
 
-public extension UIButton
-{
-    public func buttonStream<T>(map: (UIButton?) -> T) -> Stream<T>
-    {
+public extension UIButton {
+    public func buttonStream<T>(map: (UIButton?) -> T) -> Stream<T> {
         return self.stream(controlEvents: .touchUpInside) { (sender: UIControl?) -> T in
             return map(sender as? UIButton)
         }
     }
     
-    public func buttonStream<T>(mappedValue: T) -> Stream<T>
-    {
+    public func buttonStream<T>(mappedValue: T) -> Stream<T> {
         return self.stream(controlEvents: .touchUpInside) { (sender: UIControl?) -> T in
             return mappedValue
         }

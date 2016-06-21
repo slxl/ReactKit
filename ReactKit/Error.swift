@@ -8,8 +8,7 @@
 
 import Foundation
 
-public enum ReactKitError: Int
-{
+public enum ReactKitError: Int {
     public static let Domain = "ReactKitErrorDomain"
     
     case cancelled = 0
@@ -22,8 +21,7 @@ public enum ReactKitError: Int
 }
 
 /// helper
-internal func _RKError(_ error: ReactKitError, _ localizedDescriptionKey: String) -> NSError
-{
+internal func _RKError(_ error: ReactKitError, _ localizedDescriptionKey: String) -> NSError {
     return NSError(
         domain: ReactKitError.Domain,
         code: error.rawValue,

@@ -8,10 +8,8 @@
 
 import Foundation
 
-extension NSIndexSet
-{
-    public convenience init<S: Sequence where S.Iterator.Element == Int>(indexes: S)
-    {
+extension NSIndexSet {
+    public convenience init<S: Sequence where S.Iterator.Element == Int>(indexes: S) {
         let indexSet = NSMutableIndexSet()
         for index in indexes {
             indexSet.add(index)

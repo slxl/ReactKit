@@ -10,12 +10,10 @@ import Foundation
 
 private var owninigStreamsKey: UInt8 = 0
 
-internal extension NSObject
-{
+internal extension NSObject {
     internal typealias AnyStream = AnyObject // NOTE: can't use Stream<AnyObject?>
     
-    internal var _owninigStreams: [AnyStream]
-    {
+    internal var _owninigStreams: [AnyStream] {
         get {
             var owninigStreams = objc_getAssociatedObject(self, &owninigStreamsKey) as? [AnyStream]
             if owninigStreams == nil {

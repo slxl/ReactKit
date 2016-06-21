@@ -11,16 +11,13 @@ import SwiftTask
 
 // NSNull-to-nil converter for KVO which returns NSNull when nil is set
 // https://github.com/ReactKit/ReactKit/pull/18
-internal func _nullToNil(_ value: AnyObject?) -> AnyObject?
-{
+internal func _nullToNil(_ value: AnyObject?) -> AnyObject? {
     return (value is NSNull) ? nil : value
 }
 
-public extension NSObject
-{
+public extension NSObject {
     /// creates new KVO Stream (new value only)
-    public func stream(keyPath: String) -> Stream<AnyObject?>
-    {
+    public func stream(keyPath: String) -> Stream<AnyObject?> {
         let stream = self.detailedStream(keyPath: keyPath)
             |> map { value, _, _ -> AnyObject? in value }
         
@@ -28,8 +25,7 @@ public extension NSObject
     }
     
     /// creates new KVO Stream (initial + new value)
-    public func startingStream(keyPath: String) -> Stream<AnyObject?>
-    {
+    public func startingStream(keyPath: String) -> Stream<AnyObject?> {
         let initial: AnyObject? = self.value(forKeyPath: keyPath)
         
         let stream = self.stream(keyPath: keyPath)
@@ -48,10 +44,8 @@ public extension NSObject
     /// let itemsProxy = model.mutableArrayValueForKey("items")
     /// itemsProxy.insertObject(newItem, atIndex: 0) // itemsStream will send **both** `newItem` and `index`
     ///
-    public func detailedStream(keyPath: String) -> Stream<(AnyObject?, NSKeyValueChange, IndexSet?)>
-    {
+    public func detailedStream(keyPath: String) -> Stream<(AnyObject?, NSKeyValueChange, IndexSet?)> {
         return Stream { [weak self] progress, fulfill, reject, configure in
-            
             if let self_ = self {
                 let observer = _KVOProxy(target: self_, keyPath: keyPath) { value, change, indexSet in
                     progress(_nullToNil(value), change, indexSet)
@@ -63,29 +57,24 @@ public extension NSObject
                 
                 configure.resume?()
             }
-            
         }.name("KVO.detailedStream(\(_summary(self)), \"\(keyPath)\")") |> takeUntil(self.deinitStream)
     }
 }
 
 /// KVO helper
-public struct KVO
-{
+public struct KVO {
     /// creates new KVO Stream (new value only)
-    public static func stream(_ object: NSObject, _ keyPath: String) -> Stream<AnyObject?>
-    {
+    public static func stream(_ object: NSObject, _ keyPath: String) -> Stream<AnyObject?> {
         return object.stream(keyPath: keyPath)
     }
     
     /// creates new KVO Stream (initial + new value)
-    public static func startingStream(_ object: NSObject, _ keyPath: String) -> Stream<AnyObject?>
-    {
+    public static func startingStream(_ object: NSObject, _ keyPath: String) -> Stream<AnyObject?> {
         return object.startingStream(keyPath: keyPath)
     }
 
     /// creates new KVO Stream (new value, keyValueChange, indexSet)
-    public static func detailedStream(_ object: NSObject, _ keyPath: String) -> Stream<(AnyObject?, NSKeyValueChange, IndexSet?)>
-    {
+    public static func detailedStream(_ object: NSObject, _ keyPath: String) -> Stream<(AnyObject?, NSKeyValueChange, IndexSet?)> {
         return object.detailedStream(keyPath: keyPath)
     }
 }
@@ -93,8 +82,7 @@ public struct KVO
 private var ReactKitKVOContext = 0
 
 // NOTE: KVO won't work if generics is used in this class
-internal class _KVOProxy: NSObject
-{
+internal class _KVOProxy: NSObject {
     internal typealias _Handler = (value: AnyObject?, change: NSKeyValueChange, indexSet: IndexSet?) -> Void
     
     internal let _target: NSObject
@@ -103,8 +91,7 @@ internal class _KVOProxy: NSObject
     
     internal var _isObserving: Bool = false
     
-    internal init(target: NSObject, keyPath: String, handler: _Handler)
-    {
+    internal init(target: NSObject, keyPath: String, handler: _Handler) {
         self._target = target
         self._keyPath = keyPath
         self._handler = handler
@@ -118,8 +105,7 @@ internal class _KVOProxy: NSObject
 //        #endif
     }
     
-    deinit
-    {
+    deinit {
 //        #if DEBUG
 //            print("[deinit] \(self)")
 //        #endif
@@ -127,8 +113,7 @@ internal class _KVOProxy: NSObject
         self.stop()
     }
     
-    internal func start()
-    {
+    internal func start() {
         if _isObserving { return }
         
         _isObserving = true
@@ -140,8 +125,7 @@ internal class _KVOProxy: NSObject
         self._target.addObserver(self, forKeyPath: self._keyPath, options: .new, context: &ReactKitKVOContext)
     }
     
-    internal func stop()
-    {
+    internal func stop() {
         if !_isObserving { return }
         
         _isObserving = false
@@ -153,12 +137,10 @@ internal class _KVOProxy: NSObject
         self._target.removeObserver(self, forKeyPath: self._keyPath)
     }
     
-    internal override func observeValue(forKeyPath keyPath: String?, of object: AnyObject?, change: [NSKeyValueChangeKey : AnyObject]?, context: UnsafeMutablePointer<Void>?)
-    {
+    internal override func observeValue(forKeyPath keyPath: String?, of object: AnyObject?, change: [NSKeyValueChangeKey : AnyObject]?, context: UnsafeMutablePointer<Void>?) {
         if context != &ReactKitKVOContext {
             return super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
-        else {
+        } else {
             let newValue: AnyObject? = change?[NSKeyValueChangeKey.newKey]
             let keyValueChange: NSKeyValueChange = NSKeyValueChange(rawValue: (change?[NSKeyValueChangeKey.kindKey] as! NSNumber).uintValue)!
             let indexSet: IndexSet? = change?[NSKeyValueChangeKey.indexesKey] as? IndexSet
@@ -168,10 +150,8 @@ internal class _KVOProxy: NSObject
     }
 }
 
-extension NSKeyValueChange: CustomStringConvertible
-{
-    public var description: String
-    {
+extension NSKeyValueChange: CustomStringConvertible {
+    public var description: String {
         switch self {
             case .setting:      return "Setting"
             case .insertion:    return "Insertion"
@@ -190,33 +170,27 @@ infix operator <~ { associativity right }
 
 /// Key-Value Binding
 /// e.g. `(obj2, "value") <~ stream`
-@discardableResult public func <~ <T: AnyObject>(tuple: (object: NSObject, keyPath: String), stream: Stream<T?>) -> Canceller?
-{
+@discardableResult public func <~ <T: AnyObject>(tuple: (object: NSObject, keyPath: String), stream: Stream<T?>) -> Canceller? {
     return _reactLeft(tuple, stream)
 }
 
-@discardableResult public func <~ (tuple: (object: NSObject, keyPath: String), stream: Stream<String?>) -> Canceller?
-{
+@discardableResult public func <~ (tuple: (object: NSObject, keyPath: String), stream: Stream<String?>) -> Canceller? {
     return _reactLeft(tuple, stream)
 }
 
-@discardableResult public func <~ (tuple: (object: NSObject, keyPath: String), stream: Stream<Int?>) -> Canceller?
-{
+@discardableResult public func <~ (tuple: (object: NSObject, keyPath: String), stream: Stream<Int?>) -> Canceller? {
     return _reactLeft(tuple, stream)
 }
 
-@discardableResult public func <~ (tuple: (object: NSObject, keyPath: String), stream: Stream<Float?>) -> Canceller?
-{
+@discardableResult public func <~ (tuple: (object: NSObject, keyPath: String), stream: Stream<Float?>) -> Canceller? {
     return _reactLeft(tuple, stream)
 }
 
-@discardableResult public func <~ (tuple: (object: NSObject, keyPath: String), stream: Stream<Double?>) -> Canceller?
-{
+@discardableResult public func <~ (tuple: (object: NSObject, keyPath: String), stream: Stream<Double?>) -> Canceller? {
     return _reactLeft(tuple, stream)
 }
 
-private func _reactLeft <T>(_ tuple: (object: NSObject, keyPath: String), _ stream: Stream<T?>) -> Canceller?
-{
+private func _reactLeft <T>(_ tuple: (object: NSObject, keyPath: String), _ stream: Stream<T?>) -> Canceller? {
     weak var object = tuple.object
     let keyPath = tuple.keyPath
     var canceller: Canceller? = nil

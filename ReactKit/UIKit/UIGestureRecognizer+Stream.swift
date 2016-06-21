@@ -9,12 +9,9 @@
 import UIKit
 
 // NOTE: see also UIControl+Stream
-public extension UIGestureRecognizer
-{
-    public func stream<T>(map: (UIGestureRecognizer?) -> T) -> Stream<T>
-    {
+public extension UIGestureRecognizer {
+    public func stream<T>(map: (UIGestureRecognizer?) -> T) -> Stream<T> {
         return Stream<T> { [weak self] progress, fulfill, reject, configure in
-            
             let target = _TargetActionProxy { (self_: AnyObject?) in
                 progress(map(self_ as? UIGestureRecognizer))
             }
@@ -36,7 +33,6 @@ public extension UIGestureRecognizer
             }
             
             configure.resume?()
-            
         }.name("\(_summary(self))") |> takeUntil(self.deinitStream)
     }
 }

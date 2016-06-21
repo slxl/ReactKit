@@ -10,8 +10,7 @@ import Foundation
 import SwiftTask
 
 /// converts Stream<T> to Stream<U>
-public func asStream<T, U>(_ type: U.Type) -> (Stream<T>) -> Stream<U>
-{
+public func asStream<T, U>(_ type: U.Type) -> (Stream<T>) -> Stream<U> {
     return { upstream in
         let stream = upstream |> map { $0 as! U }
         return stream.name("\(upstream.name) |> asStream(\(type))")
@@ -19,16 +18,14 @@ public func asStream<T, U>(_ type: U.Type) -> (Stream<T>) -> Stream<U>
 }
 
 /// converts Stream<T> to Stream<U?>
-public func asStream<T, U>(_ type: U?.Type) -> (Stream<T>) -> Stream<U?>
-{
+public func asStream<T, U>(_ type: U?.Type) -> (Stream<T>) -> Stream<U?> {
     return { upstream in
         let stream = upstream |> map { $0 as? U }
         return stream.name("\(upstream.name) |> asStream(\(type))")
     }
 }
 
-public extension Stream
-{
+public extension Stream {
     //--------------------------------------------------
     /// MARK: - From SwiftTask
     //--------------------------------------------------
@@ -39,16 +36,13 @@ public extension Stream
     /// Task's fulfilled-value (`task.value`) will be interpreted as stream's progress-value (`stream.progress`),
     /// and any task's progress-values (`task.progress`) will be discarded.
     ///
-    public class func fromTask<P, V, E>(task: Task<P, V, E>) -> Stream<V>
-    {
+    public class func fromTask<P, V, E>(task: Task<P, V, E>) -> Stream<V> {
         return Stream<V> { progress, fulfill, reject, configure in
-            
             task.then { value, errorInfo -> Void in
                 if let value = value {
                     progress(value)
                     fulfill()
-                }
-                else if let errorInfo = errorInfo {
+                } else if let errorInfo = errorInfo {
                     if let error = errorInfo.error as? NSError {
                         reject(error)
                     }
@@ -82,21 +76,15 @@ public extension Stream
     /// will be interpreted as stream's progress-value (`stream.progress`),
     /// so unlike `Stream.fromTask(_:)`, all `task.progress` will NOT be discarded.
     ///
-    public class func fromProgressTask<P, V, E>(task: Task<P, V, E>) -> Stream<(P?, V?)>
-    {
+    public class func fromProgressTask<P, V, E>(task: Task<P, V, E>) -> Stream<(P?, V?)> {
         return Stream<(P?, V?)> { progress, fulfill, reject, configure in
-            
             task.progress { _, progressValue in
-                
                 progress(progressValue, nil)
-                
             }.then { [weak task] value, errorInfo -> Void in
-                
                 if let value = value {
                     progress(task!.progress, value)
                     fulfill()
-                }
-                else if let errorInfo = errorInfo {
+                } else if let errorInfo = errorInfo {
                     if let error = errorInfo.error as? NSError {
                         reject(error)
                     }
@@ -119,7 +107,6 @@ public extension Stream
                 task.cancel()
                 return
             }
-            
         }.name("Stream.fromProgressTask(\(task.name))")
     }
 }
