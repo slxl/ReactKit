@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1750E7C61D21EB6A00C91452 /* UIControl+Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4875885F19E4D95A00828AD0 /* UIControl+Stream.swift */; };
+		1750E7C71D21EB6A00C91452 /* UIButton+Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4875885E19E4D95A00828AD0 /* UIButton+Stream.swift */; };
+		1750E7C81D21EB6A00C91452 /* UITextField+Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4875886119E4D95A00828AD0 /* UITextField+Stream.swift */; };
+		1750E7C91D21EB6A00C91452 /* UITextView+Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = F399DCA41B3A80480084BD1F /* UITextView+Stream.swift */; };
+		1750E7CA1D21EB6A00C91452 /* UIGestureRecognizer+Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4875886019E4D95A00828AD0 /* UIGestureRecognizer+Stream.swift */; };
+		1750E7CB1D21EB6A00C91452 /* UIBarButtonItem+Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FD5B3B19E51E7100913946 /* UIBarButtonItem+Stream.swift */; };
 		1772ABAF1D188814007DC99F /* SwiftTask.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1772ABAA1D188681007DC99F /* SwiftTask.framework */; };
 		1F72332B1ABDB34C00A0C8CF /* NSIndexSet+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F72332A1ABDB34C00A0C8CF /* NSIndexSet+Helper.swift */; };
 		1F79711019E4150A0067A4C4 /* NSTimer+Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F79710F19E4150A0067A4C4 /* NSTimer+Stream.swift */; };
@@ -227,16 +233,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				1F8C3AAB1A2D8614000D9CF8 /* Error.swift in Sources */,
+				1750E7C81D21EB6A00C91452 /* UITextField+Stream.swift in Sources */,
 				4875885719E4D94800828AD0 /* Notification.swift in Sources */,
 				1FED896119C1EBD60065658B /* Stream.swift in Sources */,
+				1750E7C61D21EB6A00C91452 /* UIControl+Stream.swift in Sources */,
 				4875885919E4D94800828AD0 /* NSObject+Deinit.swift in Sources */,
 				1F79711019E4150A0067A4C4 /* NSTimer+Stream.swift in Sources */,
 				4875885B19E4D94800828AD0 /* TargetAction.swift in Sources */,
 				48DDE7721A0C41A300125F36 /* NSObject+Own.swift in Sources */,
 				4875885519E4D94800828AD0 /* KVO.swift in Sources */,
+				1750E7CB1D21EB6A00C91452 /* UIBarButtonItem+Stream.swift in Sources */,
 				4890AA901A5B70650028586C /* Stream+Conversion.swift in Sources */,
+				1750E7C91D21EB6A00C91452 /* UITextView+Stream.swift in Sources */,
 				480E83EB1ABB9B7400AF8346 /* DynamicArray.swift in Sources */,
 				1F72332B1ABDB34C00A0C8CF /* NSIndexSet+Helper.swift in Sources */,
+				1750E7CA1D21EB6A00C91452 /* UIGestureRecognizer+Stream.swift in Sources */,
+				1750E7C71D21EB6A00C91452 /* UIButton+Stream.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
