@@ -36,7 +36,7 @@ public extension Stream {
     /// Task's fulfilled-value (`task.value`) will be interpreted as stream's progress-value (`stream.progress`),
     /// and any task's progress-values (`task.progress`) will be discarded.
     ///
-    public class func fromTask<P, V, E>(task: Task<P, V, E>) -> Stream<V> {
+    public class func fromTask<P, V, E>(_ task: Task<P, V, E>) -> Stream<V> {
         return Stream<V> { progress, fulfill, reject, configure in
             task.then { value, errorInfo -> Void in
                 if let value = value {
