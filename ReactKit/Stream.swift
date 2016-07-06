@@ -238,7 +238,7 @@ public func flatMap<T, U>(_ style: FlattenStyle = .merge, transform: (T) -> Stre
     }
 }
 
-public func buffer<T>(capacity: Int = Int.max) -> (upstream: Stream<T>) -> Stream<[T]> {
+public func buffer<T>(_ capacity: Int = Int.max) -> (upstream: Stream<T>) -> Stream<[T]> {
     precondition(capacity >= 0)
  
     return { (upstream: Stream<T>) in
@@ -618,7 +618,7 @@ public func recover<T>(catchHandler: (Stream<T>.ErrorInfo) -> Stream<T>) -> (ups
 // MARK: timing
 
 /// delay `progress` and `fulfill` for `timerInterval` seconds
-public func delay<T>(timeInterval: TimeInterval) -> (upstream: Stream<T>) -> Stream<T> {
+public func delay<T>(_ timeInterval: TimeInterval) -> (upstream: Stream<T>) -> Stream<T> {
     return { (upstream: Stream<T>) in
         return Stream<T> { progress, fulfill, reject, configure in
             var canceller: Canceller? = nil
@@ -645,7 +645,7 @@ public func delay<T>(timeInterval: TimeInterval) -> (upstream: Stream<T>) -> Str
 
 /// delay `progress` and `fulfill` for `timerInterval * eachProgressCount` seconds
 /// (incremental delay with start at t = 0sec)
-public func interval<T>(timeInterval: TimeInterval) -> (upstream: Stream<T>) -> Stream<T> {
+public func interval<T>(_ timeInterval: TimeInterval) -> (upstream: Stream<T>) -> Stream<T> {
     return { (upstream: Stream<T>) in
         return Stream<T> { progress, fulfill, reject, configure in
             var canceller: Canceller? = nil
@@ -677,7 +677,7 @@ public func interval<T>(timeInterval: TimeInterval) -> (upstream: Stream<T>) -> 
 
 /// limit continuous progress (reaction) for `timeInterval` seconds when first progress is triggered
 /// (see also: underscore.js throttle)
-public func throttle<T>(timeInterval: TimeInterval) -> (upstream: Stream<T>) -> Stream<T> {
+public func throttle<T>(_ timeInterval: TimeInterval) -> (upstream: Stream<T>) -> Stream<T> {
     return { (upstream: Stream<T>) in
         return Stream<T> { progress, fulfill, reject, configure in
             var canceller: Canceller? = nil
@@ -700,7 +700,7 @@ public func throttle<T>(timeInterval: TimeInterval) -> (upstream: Stream<T>) -> 
 
 /// delay progress (reaction) for `timeInterval` seconds and truly invoke reaction afterward if not interrupted by continuous progress
 /// (see also: underscore.js debounce)
-public func debounce<T>(timeInterval: TimeInterval) -> (upstream: Stream<T>) -> Stream<T> {
+public func debounce<T>(_ timeInterval: TimeInterval) -> (upstream: Stream<T>) -> Stream<T> {
     return { (upstream: Stream<T>) in
         return Stream<T> { progress, fulfill, reject, configure in
             var canceller: Canceller? = nil
