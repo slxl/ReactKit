@@ -28,7 +28,7 @@ public extension Timer {
             configure.resume = {
                 if timer == nil {
                     timer = Timer(timeInterval: timeInterval, target: target, selector: _targetActionSelector, userInfo: userInfo, repeats: repeats)
-                    RunLoop.current().add(timer!, forMode: RunLoopMode.commonModes)
+                    RunLoop.current.add(timer!, forMode: RunLoopMode.commonModes)
                 }
             }
             configure.cancel = {

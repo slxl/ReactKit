@@ -49,10 +49,10 @@ public extension NotificationCenter {
 /// NSNotificationCenter helper
 public struct Notification {
     public static func stream(_ notificationName: Foundation.Notification.Name, _ object: AnyObject?) -> Stream<Foundation.Notification?> {
-        return NotificationCenter.default().stream(notificationName: notificationName, object: object)
+        return NotificationCenter.default.stream(notificationName: notificationName, object: object)
     }
     
     public static func post(_ notificationName: Foundation.Notification.Name, _ object: AnyObject?) {
-        NotificationCenter.default().post(name: notificationName, object: object)
+        NotificationCenter.default.post(name: notificationName, object: object)
     }
 }
