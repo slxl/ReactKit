@@ -8,7 +8,7 @@
 
 import SwiftTask
 
-public class Stream<T>: Task<T, Void, ErrorProtocol> {
+public class Stream<T>: Task<T, Void, Error> {
     public typealias Producer = () -> Stream<T>
     
     public override var description: String {
@@ -23,7 +23,7 @@ public class Stream<T>: Task<T, Void, ErrorProtocol> {
     ///
     /// - returns: New Stream.
     /// 
-    public init(initClosure: Task<T, Void, ErrorProtocol>.InitClosure) {
+    public init(initClosure: Task<T, Void, Error>.InitClosure) {
         //
         // NOTE: 
         // - set `weakified = true` to avoid "(inner) player -> stream" retaining
@@ -93,7 +93,7 @@ public extension Stream {
     }
     
     /// creates error (rejected) stream
-    public class func rejected(_ error: ErrorProtocol) -> Stream<T> {
+    public class func rejected(_ error: Error) -> Stream<T> {
         return Stream { progress, fulfill, reject, configure in
             reject(error)
         }.name("Stream.rejected(\(error))")
@@ -838,7 +838,7 @@ public func asyncBackpressureBlock<T>(_ queue: DispatchQueue, high highCountForP
             
             var count = 0
             var isBackpressuring = false
-            let lock = RecursiveLock()
+            let lock = NSRecursiveLock()
             let semaphore = DispatchSemaphore(value: 0)
             
             upstream.react(&canceller) { value in
@@ -1036,7 +1036,7 @@ public func flatten<T>(_ style: FlattenStyle) -> (upstream: Stream<Stream<T>>) -
 public func mergeInner<T>(_ upstream: Stream<Stream<T>>) -> Stream<T> {
     return Stream<T> { progress, fulfill, reject, configure in
         var unfinishedCount = 1
-        let lock = RecursiveLock()
+        let lock = NSRecursiveLock()
         
         let fulfillIfPossible: () -> Void = {
             lock.lock()
@@ -1084,7 +1084,7 @@ public func concatInner<T>(_ upstream: Stream<Stream<T>>) -> Stream<T> {
         var pendingInnerStreams = [Stream<T>]()
         
         var unfinishedCount = 1
-        let lock = RecursiveLock()
+        let lock = NSRecursiveLock()
         
         let fulfillIfPossible: () -> Void = {
             lock.lock()
@@ -1151,7 +1151,7 @@ public func switchLatestInner<T>(_ upstream: Stream<Stream<T>>) -> Stream<T> {
         var currentInnerStream: Stream<T>?
         
         var unfinishedCount = 1
-        let lock = RecursiveLock()
+        let lock = NSRecursiveLock()
         
         let finishIfPossible: (() -> Void) -> () -> Void = { finish in
             return {
@@ -1322,7 +1322,7 @@ public extension Stream {
     }
     
     /// alias for `Stream.rejected()`
-    public class func error(error: ErrorProtocol) -> Stream<T> {
+    public class func error(error: Error) -> Stream<T> {
         return self.rejected(error)
     }
 }
@@ -1512,7 +1512,7 @@ internal func _queueLabel(_ queue: DispatchQueue) -> String {
 /// - parameter downstreamConfigure: `downstream`'s `configure`
 /// - parameter reactCanceller: `canceller` used in `upstream.react(&canceller)` (`@autoclosure(escaping)` for lazy evaluation)
 ///
-private func _bindToUpstream<T, C: Canceller>(_ upstream: Stream<T>, _ downstreamFulfill: (() -> Void)?, _ downstreamReject: ((ErrorProtocol) -> Void)?, _ downstreamConfigure: TaskConfiguration?, _ reactCanceller: @autoclosure(escaping) () -> C?) {
+private func _bindToUpstream<T, C: Canceller>(_ upstream: Stream<T>, _ downstreamFulfill: (() -> Void)?, _ downstreamReject: ((Error) -> Void)?, _ downstreamConfigure: TaskConfiguration?, _ reactCanceller: @autoclosure(escaping) () -> C?) {
     //
     // NOTE:
     // Bind downstream's `configure` to upstream
@@ -1561,7 +1561,7 @@ private func _bindToUpstream<T, C: Canceller>(_ upstream: Stream<T>, _ downstrea
 }
 
 /// helper method to send upstream's fulfill/reject to downstream
-private func _finishDownstreamOnUpstreamFinished(_ upstreamName: String, _ upstreamValue: Void?, _ upstreamErrorInfo: Stream<Void>.ErrorInfo?, _ downstreamFulfill: (() -> Void)?, _ downstreamReject: ((ErrorProtocol) -> Void)?) {
+private func _finishDownstreamOnUpstreamFinished(_ upstreamName: String, _ upstreamValue: Void?, _ upstreamErrorInfo: Stream<Void>.ErrorInfo?, _ downstreamFulfill: (() -> Void)?, _ downstreamReject: ((Error) -> Void)?) {
     if upstreamValue != nil {
         downstreamFulfill?()
     } else if let upstreamErrorInfo = upstreamErrorInfo {
