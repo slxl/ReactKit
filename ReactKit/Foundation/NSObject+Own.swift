@@ -11,7 +11,7 @@ import Foundation
 private var owningStreamsKey: UInt8 = 0
 
 internal extension NSObject {
-    internal typealias AnyStream = AnyObject // NOTE: can't use Stream<AnyObject?>
+    internal typealias AnyStream = Any // NOTE: can't use Stream<Any?>
     
     internal var _owningStreams: [AnyStream] {
         get {

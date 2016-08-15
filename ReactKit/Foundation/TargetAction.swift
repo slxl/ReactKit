@@ -12,7 +12,7 @@ internal let _targetActionSelector = #selector(_TargetActionProxy.fire)
 
 internal class _TargetActionProxy {
     // NOTE: can't use generics
-    internal typealias T = AnyObject
+    internal typealias T = Any
     internal typealias Handler = (T) -> Void
     internal var handler: Handler
     

@@ -9,9 +9,9 @@
 import UIKit
 
 public extension UIBarButtonItem {
-    public func stream<T>(map: (UIBarButtonItem?) -> T) -> Stream<T> {
+    public func stream<T>(map: @escaping (UIBarButtonItem?) -> T) -> Stream<T> {
         return Stream<T> { [weak self] progress, fulfill, reject, configure in
-            let target = _TargetActionProxy { (self_: AnyObject?) in
+            let target = _TargetActionProxy { (self_: Any?) in
                 progress(map(self_ as? UIBarButtonItem))
             }
             

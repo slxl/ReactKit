@@ -11,20 +11,20 @@ import Foundation
 private var deinitStreamKey: UInt8 = 0
 
 public extension NSObject {
-    private var _deinitStream: Stream<AnyObject?>? {
+    private var _deinitStream: Stream<Any?>? {
         get {
-            return objc_getAssociatedObject(self, &deinitStreamKey) as? Stream<AnyObject?>
+            return objc_getAssociatedObject(self, &deinitStreamKey) as? Stream<Any?>
         }
         set {
             objc_setAssociatedObject(self, &deinitStreamKey, newValue, .OBJC_ASSOCIATION_RETAIN)  // not OBJC_ASSOCIATION_RETAIN_NONATOMIC
         }
     }
     
-    public var deinitStream: Stream<AnyObject?> {
-        var stream: Stream<AnyObject?>? = self._deinitStream
+    public var deinitStream: Stream<Any?> {
+        var stream: Stream<Any?>? = self._deinitStream
         
         if stream == nil {
-            stream = Stream<AnyObject?> { (progress, fulfill, reject, configure) in
+            stream = Stream<Any?> { (progress, fulfill, reject, configure) in
                 // do nothing
             }.name("\(_summary(self)).deinitStream")
             

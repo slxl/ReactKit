@@ -10,7 +10,7 @@ import Foundation
 
 public extension NotificationCenter {
     /// creates new Stream
-    public func stream(notificationName: Foundation.Notification.Name, object: AnyObject? = nil, queue: OperationQueue? = nil) -> Stream<Foundation.Notification?> {
+    public func stream(notificationName: Foundation.Notification.Name, object: Any? = nil, queue: OperationQueue? = nil) -> Stream<Foundation.Notification?> {
         return Stream { [weak self] progress, fulfill, reject, configure in
             var observer: NSObjectProtocol?
             
@@ -48,11 +48,11 @@ public extension NotificationCenter {
 
 /// NSNotificationCenter helper
 public struct Notification {
-    public static func stream(_ notificationName: Foundation.Notification.Name, _ object: AnyObject?) -> Stream<Foundation.Notification?> {
+    public static func stream(_ notificationName: Foundation.Notification.Name, _ object: Any?) -> Stream<Foundation.Notification?> {
         return NotificationCenter.default.stream(notificationName: notificationName, object: object)
     }
     
-    public static func post(_ notificationName: Foundation.Notification.Name, _ object: AnyObject?) {
+    public static func post(_ notificationName: Foundation.Notification.Name, _ object: Any?) {
         NotificationCenter.default.post(name: notificationName, object: object)
     }
 }

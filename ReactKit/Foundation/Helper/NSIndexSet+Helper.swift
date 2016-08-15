@@ -9,7 +9,7 @@
 import Foundation
 
 extension NSIndexSet {
-    public convenience init<S: Sequence where S.Iterator.Element == Int>(indexes: S) {
+    public convenience init<S: Sequence>(indexes: S) where S.Iterator.Element == Int {
         let indexSet = NSMutableIndexSet()
         for index in indexes {
             indexSet.add(index)

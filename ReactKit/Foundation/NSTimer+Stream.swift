@@ -9,9 +9,9 @@
 import Foundation
 
 public extension Timer {
-    public class func stream<T>(timeInterval: TimeInterval, userInfo: AnyObject? = nil, repeats: Bool = true, map: (Timer?) -> T) -> Stream<T> {
+    public class func stream<T>(timeInterval: TimeInterval, userInfo: Any? = nil, repeats: Bool = true, map: @escaping (Timer?) -> T) -> Stream<T> {
         return Stream { progress, fulfill, reject, configure in
-            let target = _TargetActionProxy { (self_: AnyObject?) in
+            let target = _TargetActionProxy { (self_: Any?) in
                 progress(map(self_ as? Timer))
                 
                 if !repeats {

@@ -15,7 +15,7 @@ import Foundation
 ///
 public class DynamicArray: NSObject {
     // NOTE: can't use generics for `DynamicArray` when collaborating with `mutableArrayValueForKey()`
-    public typealias Element = AnyObject
+    public typealias Element = Any
     
     public typealias ChangedTuple = ([Element]?, NSKeyValueChange, IndexSet)
     
@@ -100,7 +100,7 @@ public class ForwardingDynamicArray: DynamicArray {
     }
     
     internal init(original originalMutableArray: NSMutableArray, forwardingStreamOwner: NSObject) {
-        super.init(originalMutableArray as [Element])
+        super.init(originalMutableArray.map { $0 as Element } )
         
         let forwardingStream = self.stream().ownedBy(forwardingStreamOwner)
         

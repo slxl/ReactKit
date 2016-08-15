@@ -9,9 +9,9 @@
 import UIKit
 
 public extension UIControl {
-    public func stream<T>(controlEvents: UIControlEvents, map: (UIControl?) -> T) -> Stream<T> {
+    public func stream<T>(controlEvents: UIControlEvents, map: @escaping (UIControl?) -> T) -> Stream<T> {
         return Stream<T> { [weak self] progress, fulfill, reject, configure in
-            let target = _TargetActionProxy { (self_: AnyObject?) in
+            let target = _TargetActionProxy { (self_: Any?) in
                 //
                 // WARN:
                 //
