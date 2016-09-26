@@ -23,7 +23,7 @@ public class Stream<T>: Task<T, Void, Error> {
     ///
     /// - returns: New Stream.
     /// 
-    public init(initClosure: Task<T, Void, Error>.InitClosure) {
+    public init(initClosure: @escaping Task<T, Void, Error>.InitClosure) {
         //
         // NOTE: 
         // - set `weakified = true` to avoid "(inner) player -> stream" retaining
@@ -1256,7 +1256,7 @@ public func prestart<T>(capacity: Int = Int.max) -> (_ upstreamProducer: Stream<
 
 /// a.k.a Rx.repeat
 public func times<T>(_ repeatCount: Int) -> (_ upstreamProducer: Stream<T>.Producer) -> Stream<T>.Producer {
-    return { (upstreamProducer: Stream<T>.Producer) -> Stream<T>.Producer in
+    return { (upstreamProducer: @escaping Stream<T>.Producer) -> Stream<T>.Producer in
         if repeatCount <= 0 {
             return { Stream.empty() }
         }
@@ -1288,18 +1288,18 @@ public func times<T>(_ repeatCount: Int) -> (_ upstreamProducer: Stream<T>.Produ
                 performRecursively()
             }
         }
-    }
+    } as! (() -> Stream<T>) -> () -> Stream<T>
 }
 
-public func retry<T>(_ retryCount: Int) -> (_ upstreamProducer: Stream<T>.Producer) -> Stream<T>.Producer {
+public func retry<T>(_ retryCount: Int) -> (_ upstreamProducer: @escaping Stream<T>.Producer) -> Stream<T>.Producer {
     precondition(retryCount >= 0)
     
-    return { (upstreamProducer: Stream<T>.Producer) in
+    return { (upstreamProducer: @escaping Stream<T>.Producer) in
         if retryCount == 0 {
             return upstreamProducer
         } else {
             return upstreamProducer |>> recover { _ -> Stream<T> in
-                return (upstreamProducer |>> retry(retryCount - 1))()
+                return retry(retryCount - 1)(upstreamProducer)()
             }
         }
     }
@@ -1377,7 +1377,7 @@ public func |> <T, U, V>(transform1: @escaping (Stream<T>) -> Stream<U>, transfo
 infix operator |>>
 
 /// streamProducer lifting & pipelining operator
-public func |>> <T, U>(streamProducer: Stream<T>.Producer, transform: @escaping (Stream<T>) -> Stream<U>) -> Stream<U>.Producer {
+public func |>> <T, U>(streamProducer: @escaping Stream<T>.Producer, transform: @escaping (Stream<T>) -> Stream<U>) -> Stream<U>.Producer {
     return { transform(streamProducer()) }
 }
 

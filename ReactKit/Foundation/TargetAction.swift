@@ -16,7 +16,7 @@ internal class _TargetActionProxy {
     internal typealias Handler = (T) -> Void
     internal var handler: Handler
     
-    internal init(handler: Handler) {
+    internal init(handler: @escaping Handler) {
         self.handler = handler
     }
 

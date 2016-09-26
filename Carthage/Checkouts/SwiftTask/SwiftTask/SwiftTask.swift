@@ -67,12 +67,12 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     public typealias RejectHandler = (Error) -> Void
     public typealias Configuration = TaskConfiguration
     
-    public typealias PromiseInitClosure = (_ fulfill: FulfillHandler, _ reject: RejectHandler) -> Void
-    public typealias InitClosure = (_ progress: ProgressHandler, _ fulfill: FulfillHandler, _ reject: RejectHandler, _ configure: TaskConfiguration) -> Void
+    public typealias PromiseInitClosure = (_ fulfill: @escaping FulfillHandler, _ reject: @escaping RejectHandler) -> Void
+    public typealias InitClosure = (_ progress: @escaping ProgressHandler, _ fulfill: @escaping FulfillHandler, _ reject: @escaping RejectHandler, _ configure: TaskConfiguration) -> Void
     
     internal typealias _Machine = _StateMachine<Progress, Value, Error>
     
-    internal typealias _InitClosure = (_ machine: _Machine, _ progress: ProgressHandler, _ fulfill: FulfillHandler, _ _reject: _RejectInfoHandler, _ configure: TaskConfiguration) -> Void
+    internal typealias _InitClosure = (_ machine: _Machine, _ progress: @escaping ProgressHandler, _ fulfill: @escaping FulfillHandler, _ _reject: @escaping _RejectInfoHandler, _ configure: TaskConfiguration) -> Void
     
     internal typealias _ProgressTupleHandler = (ProgressTuple) -> Void
     internal typealias _RejectInfoHandler = (ErrorInfo) -> Void
@@ -126,7 +126,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     ///
     /// - Returns: New task.
     ///
-    public init(weakified: Bool, paused: Bool, initClosure: InitClosure)
+    public init(weakified: Bool, paused: Bool, initClosure: @escaping InitClosure)
     {
         self._weakified = weakified
         self._paused = paused
@@ -145,7 +145,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     ///
     /// - e.g. Task<P, V, E>(paused: false) { progress, fulfill, reject, configure in ... }
     ///
-    public convenience init(paused: Bool, initClosure: InitClosure)
+    public convenience init(paused: Bool, initClosure: @escaping InitClosure)
     {
         self.init(weakified: false, paused: paused, initClosure: initClosure)
     }
@@ -155,7 +155,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     ///
     /// - e.g. Task<P, V, E> { progress, fulfill, reject, configure in ... }
     ///
-    public convenience init(initClosure: InitClosure)
+    public convenience init(initClosure: @escaping InitClosure)
     {
         self.init(weakified: false, paused: false, initClosure: initClosure)
     }
@@ -191,7 +191,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     ///
     /// - e.g. Task<Any, Value, Error> { fulfill, reject in ... }
     ///
-    public convenience init(promiseInitClosure: PromiseInitClosure)
+    public convenience init(promiseInitClosure: @escaping PromiseInitClosure)
     {
         self.init(initClosure: { progress, fulfill, reject, configure in
             promiseInitClosure(fulfill, { error in reject(error) })
@@ -200,7 +200,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     
     /// internal-init for accessing `machine` inside `_initClosure`
     /// (NOTE: _initClosure has _RejectInfoHandler as argument)
-    internal init(weakified: Bool = false, paused: Bool = false, _initClosure: _InitClosure)
+    internal init(weakified: Bool = false, paused: Bool = false, _initClosure: @escaping _InitClosure)
     {
         self._weakified = weakified
         self._paused = paused
@@ -210,7 +210,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     }
     
     // NOTE: don't use `internal init` for this setup method, or this will be a designated initializer
-    internal func setup(weakified: Bool, paused: Bool, _initClosure: _InitClosure)
+    internal func setup(weakified: Bool, paused: Bool, _initClosure: @escaping _InitClosure)
     {
 //        #if DEBUG
 //            let addr = String(format: "%p", unsafeAddressOf(self))
@@ -356,7 +356,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     /// - Note: `oldProgress` is always nil when `weakified = true`
     /// - Returns: Self (same `Task`)
     ///
-    @discardableResult public func progress(progressClosure: @escaping (ProgressTuple) -> Void) -> Self
+    @discardableResult public func progress(_ progressClosure: @escaping (ProgressTuple) -> Void) -> Self
     {
         var dummyCanceller: Canceller? = nil
         return self.progress(&dummyCanceller, progressClosure)
@@ -382,7 +382,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     ///
     /// - Returns: New `Task`
     ///
-    @discardableResult public func then<Value2>(thenClosure: @escaping (Value?, ErrorInfo?) -> Value2) -> Task<Progress, Value2, Error>
+    @discardableResult public func then<Value2>(_ thenClosure: @escaping (Value?, ErrorInfo?) -> Value2) -> Task<Progress, Value2, Error>
     {
         var dummyCanceller: Canceller? = nil
         return self.then(&dummyCanceller, thenClosure)
@@ -403,7 +403,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     ///
     /// - Returns: New `Task`
     ///
-    public func then<Progress2, Value2, Error2>(thenClosure: @escaping (Value?, ErrorInfo?) -> Task<Progress2, Value2, Error2>) -> Task<Progress2, Value2, Error2>
+    public func then<Progress2, Value2, Error2>(_ thenClosure: @escaping (Value?, ErrorInfo?) -> Task<Progress2, Value2, Error2>) -> Task<Progress2, Value2, Error2>
     {
         var dummyCanceller: Canceller? = nil
         return self.then(&dummyCanceller, thenClosure)
@@ -462,7 +462,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     ///
     /// - Returns: New `Task`
     ///
-    @discardableResult public func success<Value2>(successClosure: @escaping (Value) -> Value2) -> Task<Progress, Value2, Error>
+    @discardableResult public func success<Value2>(_ successClosure: @escaping (Value) -> Value2) -> Task<Progress, Value2, Error>
     {
         var dummyCanceller: Canceller? = nil
         return self.success(&dummyCanceller, successClosure)
@@ -483,7 +483,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     ///
     /// - Returns: New `Task`
     ///
-    public func success<Progress2, Value2, Error2>(successClosure: @escaping (Value) -> Task<Progress2, Value2, Error2>) -> Task<Progress2, Value2, Error>
+    public func success<Progress2, Value2, Error2>(_ successClosure: @escaping (Value) -> Task<Progress2, Value2, Error2>) -> Task<Progress2, Value2, Error>
     {
         var dummyCanceller: Canceller? = nil
         return self.success(&dummyCanceller, successClosure)
@@ -519,7 +519,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     ///
     /// - Returns: New `Task`
     ///
-    @discardableResult public func failure(failureClosure: @escaping (ErrorInfo) -> Value) -> Task
+    @discardableResult public func failure(_ failureClosure: @escaping (ErrorInfo) -> Value) -> Task
     {
         var dummyCanceller: Canceller? = nil
         return self.failure(&dummyCanceller, failureClosure)
@@ -541,7 +541,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     ///
     /// - Returns: New `Task`
     ///
-    public func failure<Progress2, Error2>(failureClosure: @escaping (ErrorInfo) -> Task<Progress2, Value, Error2>) -> Task<Progress2, Value, Error2>
+    public func failure<Progress2, Error2>(_ failureClosure: @escaping (ErrorInfo) -> Task<Progress2, Value, Error2>) -> Task<Progress2, Value, Error2>
     {
         var dummyCanceller: Canceller? = nil
         return self.failure(&dummyCanceller, failureClosure)
@@ -620,9 +620,9 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
 internal func _bindInnerTask<Progress2, Value2, Error, Error2>(
     _ innerTask: Task<Progress2, Value2, Error2>,
     _ newMachine: _StateMachine<Progress2, Value2, Error>,
-    _ progress: Task<Progress2, Value2, Error>.ProgressHandler,
-    _ fulfill: Task<Progress2, Value2, Error>.FulfillHandler,
-    _ _reject: Task<Progress2, Value2, Error>._RejectInfoHandler,
+    _ progress: @escaping Task<Progress2, Value2, Error>.ProgressHandler,
+    _ fulfill: @escaping Task<Progress2, Value2, Error>.FulfillHandler,
+    _ _reject: @escaping Task<Progress2, Value2, Error>._RejectInfoHandler,
     _ configure: TaskConfiguration
     )
 {

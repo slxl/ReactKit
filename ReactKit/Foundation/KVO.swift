@@ -91,7 +91,7 @@ internal class _KVOProxy: NSObject {
     
     internal var _isObserving: Bool = false
     
-    internal init(target: NSObject, keyPath: String, handler: _Handler) {
+    internal init(target: NSObject, keyPath: String, handler: @escaping _Handler) {
         self._target = target
         self._keyPath = keyPath
         self._handler = handler
