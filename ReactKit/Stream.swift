@@ -917,7 +917,7 @@ public func merge2All<T>(_ streams: [Stream<T>]) -> Stream<(values: [T?], change
             
             stream.react(&canceller) { value in
                 states[i] = value
-                progress(values: states, changedValue: value)
+                progress((values: states, changedValue: value))
             }.then { value, errorInfo -> Void in
                 if value != nil {
                     fulfill()

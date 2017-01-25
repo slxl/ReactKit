@@ -48,7 +48,7 @@ public extension NSObject {
         return Stream { [weak self] progress, fulfill, reject, configure in
             if let self_ = self {
                 let observer = _KVOProxy(target: self_, keyPath: keyPath) { value, change, indexSet in
-                    progress(_nullToNil(value), change, indexSet)
+                    progress((_nullToNil(value), change, indexSet))
                 }
                 
                 configure.pause = { observer.stop() }

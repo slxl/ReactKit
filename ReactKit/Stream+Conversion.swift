@@ -79,10 +79,10 @@ public extension Stream {
     public class func fromProgressTask<P, V, E>(task: Task<P, V, E>) -> Stream<(P?, V?)> {
         return Stream<(P?, V?)> { progress, fulfill, reject, configure in
             task.progress { _, progressValue in
-                progress(progressValue, nil)
+                progress((progressValue, nil))
             }.then { [weak task] value, errorInfo -> Void in
                 if let value = value {
-                    progress(task!.progress, value)
+                    progress((task!.progress, value))
                     fulfill()
                 } else if let errorInfo = errorInfo {
                     if let error = errorInfo.error as? NSError {
