@@ -17,18 +17,18 @@ internal func _nullToNil(_ value: Any?) -> Any? {
 
 public extension NSObject {
     /// creates new KVO Stream (new value only)
-    public func stream(keyPath: String) -> Stream<Any?> {
-        let stream = self.detailedStream(keyPath: keyPath)
+    public func stream(_ keyPath: String) -> Stream<Any?> {
+        let stream = self.detailedStream(keyPath)
             |> map { value, _, _ -> Any? in value }
         
         return stream.name("KVO.stream(\(_summary(self)), \"\(keyPath)\")")
     }
     
     /// creates new KVO Stream (initial + new value)
-    public func startingStream(keyPath: String) -> Stream<Any?> {
+    public func startingStream(_ keyPath: String) -> Stream<Any?> {
         let initial: Any? = self.value(forKeyPath: keyPath)
         
-        let stream = self.stream(keyPath: keyPath)
+        let stream = self.stream(keyPath)
             |> startWith(_nullToNil(initial))
         
         return stream.name("KVO.startingStream(\(_summary(self)), \"\(keyPath)\")")
@@ -44,7 +44,7 @@ public extension NSObject {
     /// let itemsProxy = model.mutableArrayValueForKey("items")
     /// itemsProxy.insertObject(newItem, atIndex: 0) // itemsStream will send **both** `newItem` and `index`
     ///
-    public func detailedStream(keyPath: String) -> Stream<(Any?, NSKeyValueChange, IndexSet?)> {
+    public func detailedStream(_ keyPath: String) -> Stream<(Any?, NSKeyValueChange, IndexSet?)> {
         return Stream { [weak self] progress, fulfill, reject, configure in
             if let self_ = self {
                 let observer = _KVOProxy(target: self_, keyPath: keyPath) { value, change, indexSet in
@@ -65,17 +65,17 @@ public extension NSObject {
 public struct KVO {
     /// creates new KVO Stream (new value only)
     public static func stream(_ object: NSObject, _ keyPath: String) -> Stream<Any?> {
-        return object.stream(keyPath: keyPath)
+        return object.stream(keyPath)
     }
     
     /// creates new KVO Stream (initial + new value)
     public static func startingStream(_ object: NSObject, _ keyPath: String) -> Stream<Any?> {
-        return object.startingStream(keyPath: keyPath)
+        return object.startingStream(keyPath)
     }
 
     /// creates new KVO Stream (new value, keyValueChange, indexSet)
     public static func detailedStream(_ object: NSObject, _ keyPath: String) -> Stream<(Any?, NSKeyValueChange, IndexSet?)> {
-        return object.detailedStream(keyPath: keyPath)
+        return object.detailedStream(keyPath)
     }
 }
 
