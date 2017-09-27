@@ -15,5 +15,5 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '8.0'
   s.ios.exclude_files = "ReactKit/AppKit"
 
-  s.dependency 'SwiftTask', '~> 4.0.0'
+  s.dependency 'SwiftTask', '> 4.0.0'
 end
